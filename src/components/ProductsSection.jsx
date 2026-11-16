@@ -121,187 +121,170 @@ const ProductsSection = () => {
     : PRODUCTS_DATA.filter((item) => item.categoryId === selectedCategory);
 
   return (
-    <section id="products" className="py-24 bg-[#FAF7F2] border-t border-[#D9C6A5]/50">
-      <div className="max-w-[1340px] mx-auto px-6 md:px-10">
+    <section id="products" className="py-16 md:py-24 bg-[#FAF7F2] border-t border-[#D9C6A5]/50">
+      <div className="max-w-[1340px] mx-auto px-4 sm:px-6 md:px-10">
         
-        {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+        {/* Section Header & Filter Tabs */}
+        <div className="flex flex-col gap-6 md:flex-row md:items-end justify-between mb-8 md:mb-12">
           <div>
             <span className="text-xs font-semibold text-[#A98955] tracking-[3px] uppercase block mb-1">
               Curated Catalog
             </span>
-            <h2 className="text-3xl sm:text-5xl font-serif font-bold text-[#191919] tracking-tight">
-              Our Signature Pieces
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold text-[#191919] tracking-tight">
+              Signature Pieces
             </h2>
           </div>
 
-          {/* Individual Category Filter Tabs */}
-          <div className="flex flex-wrap items-center gap-2 bg-white/70 backdrop-blur-md p-1.5 rounded-full border border-[#D9C6A5]/60 shadow-sm">
-            {CATEGORY_TABS.map((tab) => {
-              const isActive = selectedCategory === tab.id;
-              const count = tab.id === 'all'
-                ? PRODUCTS_DATA.length
-                : PRODUCTS_DATA.filter(p => p.categoryId === tab.id).length;
+          {/* Clean, horizontally scrollable tabs on mobile, pill bar on tablet/desktop */}
+          <div className="w-full md:w-auto overflow-x-auto scrollbar-none py-1">
+            <div className="inline-flex items-center gap-2 p-1.5 rounded-2xl md:rounded-full bg-white/80 border border-[#D9C6A5]/60 shadow-sm backdrop-blur-md">
+              {CATEGORY_TABS.map((tab) => {
+                const isActive = selectedCategory === tab.id;
+                const count = tab.id === 'all'
+                  ? PRODUCTS_DATA.length
+                  : PRODUCTS_DATA.filter(p => p.categoryId === tab.id).length;
 
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setSelectedCategory(tab.id)}
-                  className={`relative px-5 py-2.5 rounded-full text-xs font-semibold uppercase tracking-wider transition-all duration-200 ${
-                    isActive
-                      ? 'text-white'
-                      : 'text-gray-600 hover:text-[#191919]'
-                  }`}
-                >
-                  {isActive && (
-                    <motion.div
-                      layoutId="activeCategoryPill"
-                      transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                      className="absolute inset-0 bg-[#191919] rounded-full shadow-md z-0"
-                    />
-                  )}
-                  <span className="relative z-10">
-                    {tab.label} ({count})
-                  </span>
-                </button>
-              );
-            })}
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setSelectedCategory(tab.id)}
+                    className={`relative whitespace-nowrap px-4 sm:px-5 py-2.5 rounded-full text-xs font-semibold uppercase tracking-wider transition-colors duration-200 shrink-0 ${
+                      isActive
+                        ? 'text-white'
+                        : 'text-gray-600 hover:text-[#191919]'
+                    }`}
+                  >
+                    {isActive && (
+                      <motion.div
+                        layoutId="activeCategoryPill"
+                        transition={{ type: 'spring', damping: 25, stiffness: 320 }}
+                        className="absolute inset-0 bg-[#191919] rounded-full shadow-md z-0"
+                      />
+                    )}
+                    <span className="relative z-10 flex items-center gap-1.5">
+                      {tab.label}
+                      <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${
+                        isActive ? 'bg-white/20 text-white' : 'bg-[#FAF7F2] text-[#A98955]'
+                      }`}>
+                        {count}
+                      </span>
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
 
-        {/* 3D Perspective Card-Flip & Shimmer Transition Grid */}
-        <motion.div
-          layout
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-7"
-          style={{ perspective: 1000 }}
-        >
-          <AnimatePresence mode="popLayout">
-            {filteredProducts.map((product, index) => (
-              <motion.div
-                layout
-                key={product.id}
-                initial={{
-                  opacity: 0,
-                  rotateY: -35,
-                  rotateX: 15,
-                  scale: 0.8,
-                  y: 40
-                }}
-                animate={{
-                  opacity: 1,
-                  rotateY: 0,
-                  rotateX: 0,
-                  scale: 1,
-                  y: 0
-                }}
-                exit={{
-                  opacity: 0,
-                  rotateY: 35,
-                  rotateX: -15,
-                  scale: 0.75,
-                  y: -30
-                }}
-                transition={{
-                  duration: 0.45,
-                  delay: index * 0.05,
-                  type: 'spring',
-                  damping: 20,
-                  stiffness: 220
-                }}
-                whileHover={{
-                  y: -10,
-                  rotateY: 4,
-                  rotateX: -4,
-                  boxShadow: '0 25px 50px -12px rgba(169, 137, 85, 0.25)',
-                  transition: { duration: 0.25 }
-                }}
-                onClick={() => setSelectedProduct(product)}
-                className="group bg-white rounded-2xl border border-[#D9C6A5]/60 overflow-hidden flex flex-col justify-between shadow-sm hover:border-[#A98955] transition-colors duration-300 cursor-pointer relative"
-              >
-                {/* Image Box with Shimmer Effect */}
-                <div className="h-72 bg-[#F1E9DC] overflow-hidden relative">
-                  <span className="absolute top-3.5 left-3.5 z-10 text-[10px] font-bold tracking-widest uppercase px-3 py-1 rounded-full bg-white/90 backdrop-blur-md border border-[#D9C6A5] text-[#191919] shadow-sm">
-                    {product.tag}
-                  </span>
-
-                  <img
-                    src={product.image}
-                    alt={product.title}
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.src = FALLBACK_IMG;
-                    }}
-                    className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-700 ease-out"
-                  />
-
-                  {/* Elegant Golden Shimmer Sheen on Hover */}
-                  <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out pointer-events-none" />
-                </div>
-
-                {/* Details */}
-                <div className="p-5 flex flex-col justify-between flex-1">
-                  <div>
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-[#A98955] mb-1 block">
-                      {product.categoryName} • 18K Solid Gold
+        {/* Responsive Products Grid: Solid, non-stretching fade animation */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6 md:gap-7">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={selectedCategory}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: 0.25, ease: 'easeOut' }}
+              className="contents"
+            >
+              {filteredProducts.map((product) => (
+                <div
+                  key={product.id}
+                  onClick={() => setSelectedProduct(product)}
+                  className="group bg-white rounded-2xl border border-[#D9C6A5]/60 overflow-hidden flex flex-col justify-between shadow-sm hover:border-[#A98955] hover:shadow-xl transition-all duration-300 cursor-pointer relative"
+                >
+                  {/* Image Box */}
+                  <div className="h-64 sm:h-72 md:h-80 bg-[#F1E9DC] overflow-hidden relative">
+                    <span className="absolute top-3.5 left-3.5 z-10 text-[10px] font-bold tracking-widest uppercase px-3 py-1 rounded-full bg-white/95 backdrop-blur-md border border-[#D9C6A5] text-[#191919] shadow-sm">
+                      {product.tag}
                     </span>
-                    <h3 className="font-serif text-xl font-bold text-[#191919] group-hover:text-[#A98955] transition-colors">
-                      {product.title}
-                    </h3>
-                    <p className="text-xs text-gray-500 mt-1 line-clamp-1 leading-relaxed">
-                      {product.specs}
-                    </p>
+
+                    <img
+                      src={product.image}
+                      alt={product.title}
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = FALLBACK_IMG;
+                      }}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+
+                    {/* Luxury Shimmer Overlay on hover */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 pointer-events-none"></div>
+
+                    {/* Quick View Button */}
+                    <div className="absolute bottom-3 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 px-4 py-1.5 rounded-full bg-[#191919]/90 text-white text-[11px] font-semibold backdrop-blur-sm whitespace-nowrap shadow-md">
+                      Quick View
+                    </div>
                   </div>
 
-                  <div className="flex items-center justify-between pt-4 mt-5 border-t border-[#D9C6A5]/40">
+                  {/* Details Footer */}
+                  <div className="p-4 sm:p-5 flex flex-col justify-between flex-1">
                     <div>
-                      {product.originalPrice && (
-                        <span className="text-[11px] line-through text-gray-400 block">
-                          {product.originalPrice}
-                        </span>
-                      )}
-                      <span className="text-lg font-bold text-[#191919]">
-                        {product.price}
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-[#A98955] mb-1 block">
+                        {product.categoryName} • 18K Solid Gold
                       </span>
+                      <h3 className="font-serif text-lg sm:text-xl font-bold text-[#191919] group-hover:text-[#A98955] transition-colors line-clamp-1">
+                        {product.title}
+                      </h3>
+                      <p className="text-xs text-gray-600 mt-1 line-clamp-2 leading-relaxed">
+                        {product.specs}
+                      </p>
                     </div>
 
-                    <div className="w-8 h-8 rounded-full bg-[#EEEEEC] border border-[#D9C6A5] flex items-center justify-center text-[#191919] group-hover:bg-[#191919] group-hover:text-white transition-all text-xs">
-                      &rarr;
+                    <div className="flex items-center justify-between pt-3.5 mt-4 border-t border-[#D9C6A5]/40">
+                      <div>
+                        {product.originalPrice && (
+                          <span className="text-[10.5px] line-through text-gray-400 block">
+                            {product.originalPrice}
+                          </span>
+                        )}
+                        <span className="text-base sm:text-lg font-bold text-[#191919]">
+                          {product.price}
+                        </span>
+                      </div>
+
+                      <div className="w-8 h-8 rounded-full bg-[#EEEEEC] border border-[#D9C6A5] flex items-center justify-center text-[#191919] group-hover:bg-[#191919] group-hover:text-white transition-all text-xs">
+                        &rarr;
+                      </div>
                     </div>
                   </div>
                 </div>
-              </motion.div>
-            ))}
+              ))}
+            </motion.div>
           </AnimatePresence>
-        </motion.div>
+        </div>
 
       </div>
 
-      {/* Pop Up Bigger Modal */}
+      {/* Clean Quick View Modal (Natural fade-in, no elastic stretching) */}
       <AnimatePresence>
         {selectedProduct && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
             onClick={() => setSelectedProduct(null)}
-            className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6"
+            className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6"
           >
             <motion.div
-              initial={{ scale: 0.82, y: 40, opacity: 0 }}
-              animate={{ scale: 1, y: 0, opacity: 1 }}
-              exit={{ scale: 0.82, y: 40, opacity: 0 }}
-              transition={{ type: 'spring', damping: 25, stiffness: 280 }}
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 16 }}
+              transition={{ duration: 0.25, ease: 'easeOut' }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-3xl border border-[#D9C6A5] max-w-3xl w-full overflow-hidden shadow-2xl relative grid grid-cols-1 md:grid-cols-2"
+              className="bg-white rounded-3xl border border-[#D9C6A5] max-w-3xl w-full max-h-[92vh] overflow-y-auto shadow-2xl relative grid grid-cols-1 md:grid-cols-2"
             >
               <button
                 onClick={() => setSelectedProduct(null)}
                 className="absolute top-4 right-4 z-20 w-8 h-8 rounded-full bg-[#EEEEEC] border border-[#D9C6A5] flex items-center justify-center text-[#191919] font-bold hover:bg-[#191919] hover:text-white transition-all shadow-md"
+                aria-label="Close"
               >
                 &times;
               </button>
 
-              <div className="h-72 md:h-full bg-[#F1E9DC] overflow-hidden relative">
+              <div className="h-64 sm:h-80 md:h-full bg-[#F1E9DC] overflow-hidden relative">
                 <img
                   src={selectedProduct.image}
                   alt={selectedProduct.title}
@@ -316,7 +299,7 @@ const ProductsSection = () => {
                 </span>
               </div>
 
-              <div className="p-8 sm:p-10 flex flex-col justify-between">
+              <div className="p-6 sm:p-8 md:p-10 flex flex-col justify-between">
                 <div>
                   <span className="text-xs uppercase tracking-widest text-[#A98955] font-bold">
                     {selectedProduct.categoryName} • Certified 18K Gold
@@ -326,7 +309,7 @@ const ProductsSection = () => {
                   </h3>
 
                   <div className="flex items-baseline gap-3 my-4">
-                    <span className="text-3xl font-bold text-[#191919]">
+                    <span className="text-2xl sm:text-3xl font-bold text-[#191919]">
                       {selectedProduct.price}
                     </span>
                     {selectedProduct.originalPrice && (

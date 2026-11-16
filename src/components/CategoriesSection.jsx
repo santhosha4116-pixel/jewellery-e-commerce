@@ -55,10 +55,9 @@ const CategoriesSection = () => {
   const sectionRefs = useRef([]);
   const isClickScrollingRef = useRef(false);
 
-  // Accurate scroll calculation
+  // Accurate scroll calculation for desktop & tablet scroll
   useEffect(() => {
     const handleScroll = () => {
-      // Don't fight programmatic click-scrolling
       if (isClickScrollingRef.current) return;
       if (!categoriesContainerRef.current) return;
 
@@ -79,7 +78,6 @@ const CategoriesSection = () => {
       sectionRefs.current.forEach((el, index) => {
         if (!el) return;
         const elRect = el.getBoundingClientRect();
-        // If element top has passed the trigger line, it becomes current
         if (elRect.top <= triggerY) {
           currentIndex = index;
         }
@@ -93,14 +91,17 @@ const CategoriesSection = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Smooth click navigation to any category without glitching
+  // Smooth click navigation
   const scrollToCategory = (index) => {
+    setActiveCategoryIndex(index);
+
+    // On mobile screens, don't trigger massive page jumps
+    if (window.innerWidth < 1024) return;
+
     const targetEl = sectionRefs.current[index];
     if (!targetEl) return;
 
-    setActiveCategoryIndex(index);
     isClickScrollingRef.current = true;
-
     const navOffset = 120;
     const targetTop = targetEl.getBoundingClientRect().top + window.pageYOffset - navOffset;
 
@@ -120,22 +121,159 @@ const CategoriesSection = () => {
     <section
       id="categories"
       ref={categoriesContainerRef}
-      className="max-w-[1340px] mx-auto px-6 md:px-10 pt-20 pb-36"
+      className="max-w-[1340px] mx-auto px-4 sm:px-6 md:px-10 pt-16 md:pt-24 pb-20 md:pb-36"
     >
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start relative">
+      {/* =========================================================================
+          1. MOBILE VIEW (< 1024px: Phones and Tablets)
+          Intuitive, touch-friendly tab selector + visual preview card with circular reveal
+         ========================================================================= */}
+      <div className="block lg:hidden">
+        {/* Section Title */}
+        <div className="mb-6">
+          <span className="text-xs font-semibold text-[#A98955] tracking-[3px] uppercase block mb-1">
+            Collections & Categories
+          </span>
+          <h2 className="text-3xl sm:text-4xl font-serif font-bold text-[#191919] tracking-tight">
+            Curated Categories
+          </h2>
+          <p className="text-xs sm:text-sm text-gray-600 mt-2 max-w-lg">
+            Tap through each category to explore signature silhouettes crafted in 18k solid gold.
+          </p>
+        </div>
+
+        {/* Clean, horizontally scrollable category tabs */}
+        <div className="overflow-x-auto scrollbar-none py-1 mb-6 -mx-4 px-4 sm:mx-0 sm:px-0">
+          <div className="inline-flex items-center gap-2 p-1.5 rounded-2xl bg-white/80 border border-[#D9C6A5]/60 shadow-sm backdrop-blur-md">
+            {CATEGORIES_DATA.map((cat, idx) => {
+              const isSelected = activeCategoryIndex === idx;
+              return (
+                <button
+                  key={cat.id}
+                  onClick={() => scrollToCategory(idx)}
+                  className={`relative whitespace-nowrap px-4 py-2.5 rounded-xl text-xs font-semibold uppercase tracking-wider transition-colors duration-200 shrink-0 ${
+                    isSelected ? 'text-white' : 'text-gray-600 hover:text-[#191919]'
+                  }`}
+                >
+                  {isSelected && (
+                    <motion.div
+                      layoutId="mobileCategoryTabActive"
+                      transition={{ type: 'spring', damping: 25, stiffness: 320 }}
+                      className="absolute inset-0 bg-[#191919] rounded-xl shadow-md z-0"
+                    />
+                  )}
+                  <span className="relative z-10 flex items-center gap-2">
+                    <span className={isSelected ? 'text-[#A98955]' : 'text-gray-400'}>
+                      {cat.num}
+                    </span>
+                    {cat.title.split('&')[0].trim()}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Mobile / Tablet Dynamic Card with circular reveal transition */}
+        <div className="bg-white rounded-3xl border border-[#D9C6A5]/60 p-5 sm:p-7 shadow-lg overflow-hidden">
+          {/* Circular mask image reveal on category change */}
+          <div className="h-64 sm:h-80 w-full rounded-2xl overflow-hidden bg-[#F1E9DC] relative mb-6 shadow-inner">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeCategory.id}
+                initial={{
+                  clipPath: 'circle(0% at 50% 50%)',
+                  scale: 1.08,
+                  opacity: 0
+                }}
+                animate={{
+                  clipPath: 'circle(150% at 50% 50%)',
+                  scale: 1,
+                  opacity: 1
+                }}
+                exit={{
+                  clipPath: 'circle(0% at 50% 50%)',
+                  scale: 0.96,
+                  opacity: 0
+                }}
+                transition={{
+                  duration: 0.35,
+                  ease: [0.16, 1, 0.3, 1]
+                }}
+                className="absolute inset-0 w-full h-full"
+              >
+                <img
+                  src={activeCategory.image}
+                  alt={activeCategory.title}
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = FALLBACK_IMG;
+                  }}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
+              </motion.div>
+            </AnimatePresence>
+
+            <div className="absolute bottom-4 left-4 z-20 px-4 py-1.5 rounded-full bg-[#191919]/90 backdrop-blur-md text-white text-[11px] font-bold tracking-widest shadow-md flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-[#A98955] animate-pulse"></span>
+              <span>{activeCategory.countIndicator}</span>
+            </div>
+          </div>
+
+          {/* Details & Button */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold tracking-widest text-[#A98955]">
+                {activeCategory.num}
+              </span>
+              <span className="w-6 h-[1.5px] bg-[#A98955]"></span>
+              <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                {activeCategory.subtitle}
+              </span>
+            </div>
+
+            <h3 className="text-2xl sm:text-3xl font-serif font-bold text-[#191919]">
+              {activeCategory.title}
+            </h3>
+
+            <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
+              {activeCategory.desc}
+            </p>
+
+            <div className="pt-3">
+              <a
+                href="#products"
+                className="inline-flex items-center justify-center gap-2 w-full sm:w-auto px-7 py-3 rounded-full bg-[#191919] text-white text-xs font-semibold hover:bg-[#A98955] transition-all group shadow-md"
+              >
+                <span>{activeCategory.btnText}</span>
+                <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center text-[10px] group-hover:rotate-45 transition-transform">
+                  ↗
+                </span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* =========================================================================
+          2. DESKTOP VIEW (≥ 1024px: Desktops & Laptops)
+          The full FurnitureOne scroll-spy experience with vertical line and sticky reveal
+         ========================================================================= */}
+      <div className="hidden lg:grid grid-cols-12 gap-12 lg:gap-16 items-start relative">
         
         {/* Left Column: Vertical Progress Line + Sequential Categories */}
         <div className="lg:col-span-5 relative pl-10 pt-4 pb-20">
           
           {/* Animated Track */}
-          <div className="absolute left-2 top-6 bottom-24 w-[2px] bg-[#D9C6A5]/35 rounded-full">
+          <div className="absolute left-2 top-6 bottom-24 w-[2px] bg-[#D9C6A5]/40 rounded-full">
             <motion.div
               className="w-full bg-[#191919] rounded-full origin-top"
               style={{ height: `${lineProgress * 100}%` }}
               transition={{ ease: 'easeOut', duration: 0.15 }}
             />
+            {/* Arrow Pointer Moving Down */}
             <motion.div
-              className="absolute -left-[5px] w-3 h-3 rounded-full bg-[#A98955] border-2 border-white shadow-md flex items-center justify-center text-[7px] text-white"
+              className="absolute -left-[5px] w-3.5 h-3.5 rounded-full bg-[#A98955] border-2 border-[#FAF7F2] shadow-md flex items-center justify-center text-[7px] text-white"
               style={{ top: `${lineProgress * 100}%` }}
               transition={{ ease: 'easeOut', duration: 0.15 }}
             >
