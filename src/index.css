@@ -1,4 +1,4 @@
-@import "tailwindcss";
+﻿@import "tailwindcss";
 
 * {
   box-sizing: border-box;
@@ -13,4 +13,13 @@ body {
   font-family: Arial, sans-serif;
   background-color: #F7F3ED;
   color: #29251F;
+}
+
+@keyframes marqueeScroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-1800px);
+  }
 }

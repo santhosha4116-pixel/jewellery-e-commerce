@@ -1,15 +1,19 @@
-import Navbar from "./components/Navbar";
+﻿import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
-import Footer from "./components/Footer";
+import CategoriesSection from "./components/CategoriesSection";
+import ProductsSection from "./components/ProductsSection";
 import FAQ from "./components/FQA";
+import Footer from "./components/Footer";
 
 function App() {
   return (
     <>
       <Navbar />
-       <Home />
-       <FAQ/>
-       <Footer/>
+      <Home />
+      <CategoriesSection />
+      <ProductsSection />
+      <FAQ />
+      <Footer />
     </>
   );
 }
