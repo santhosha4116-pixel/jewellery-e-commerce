@@ -1,4 +1,5 @@
-﻿import Navbar from "./components/Navbar";
+﻿
+import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
 import CategoriesSection from "./components/CategoriesSection";
 import ProductsSection from "./components/ProductsSection";
@@ -9,10 +10,25 @@ function App() {
   return (
     <>
       <Navbar />
+
       <Home />
-      <CategoriesSection />
-      <ProductsSection />
-      <FAQ />
+
+      <section id="collections">
+        <CategoriesSection />
+      </section>
+
+      <section id="products">
+        <ProductsSection />
+      </section>
+
+      <section id="about">
+        {/* Your About component goes here */}
+      </section>
+
+      <section id="faq">
+        <FAQ />
+      </section>
+
       <Footer />
     </>
   );
