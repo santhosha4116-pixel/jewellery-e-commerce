@@ -7,9 +7,10 @@ const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const navLinks = [
+    { name: "Home", id: "Home" },
     { name: "Collections", id: "collections" },
     { name: "Products", id: "products" },
-    
+    { name: "AboutUs", id: "about" },
     { name: "FAQ", id: "faq" },
   ];
 
@@ -23,7 +24,7 @@ const Navbar = () => {
   };
 
   return (
-    <header className="sticky top-0 w-full bg-[#EEEEEC] px-4 sm:px-6 pt-5 z-50">
+    <header className="sticky top-0 w-full bg-[#F7F3ED] px-4 sm:px-6 pt-5 z-50">
       <div className="max-w-[1200px] mx-auto">
 
         <div className="h-[72px] bg-white/85 rounded-full px-6 md:px-9 flex items-center justify-between shadow-sm">
